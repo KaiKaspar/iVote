@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>iVote</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+    <script defer="defer" src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  </head>
+
+  <body>
+    <div style="min-height:440px">
+
+      <% if current_user %>
+        <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+          <div class="navbar-brand">
+            <a class="navbar-item" href="<%= root_path %>"><strong>iVote</strong></a>
+          </div>
+        <% else %>
+          <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+              <a class="navbar-item" href="#">
+                <strong>iVote</strong>
+              </a>
+            </div>
+          <% end %>
+          <% if current_user %>
+            <div class="navbar-menu">
+              <a class="navbar-item" href="<%= users_path %>">
+                <strong>Users</strong>
+              </a>
+              <a class="navbar-item" href="<%= leaderboard_path(current_user.id) %>">
+                <strong>Leaderboard</strong>
+              </a>
+
+            </div>
+            <div class="navbar is-primary" role="navigation" aria-label="dropdown navigation">
+              <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link" style="width:120px">
+                  <h2 class="title is-6"><b><%= current_user.username.capitalize %></b></h2>
+                </a>
+                <div class="navbar-end">
+                  <div class="navbar-dropdown">
+                    <a class="navbar-item" href="<%= user_path(current_user.id) %>">Profile</a>
+                    <a class="navbar-item" href="<%= logout_path %>">Logout</a>
+                    <a class="navbar-item" href="<%= upgrade_path(current_user.id) %>">Upgrade</a>
+                    <hr class="navbar-divider">
+                    <div class="navbar-item">
+                      Score:
+                      <%= current_user.score %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% else %>
+            <div class="navbar-menu">
+              <a class="navbar-item" href="<%= login_path %>">Sign In</a>
+              <a class="navbar-item" href="<%= new_user_path %>">Sign Up</a>
+            </div>
+          <% end %>
+        </nav>
+        <% if current_user %>
+          <div class="container is-fluid">
+            <%= yield %>
+          </div>
+        <% else %>
+
+          <div class="columns">
+            <div class="column is-8 is-centered" id="home">
+              <p style="position: relative" id="pid">
+                <b>iVote</b>
+              </p>
+
+            </div>
+            <div class="column is-4" style="text-align:center">
+              <%= yield %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </body>
+    <footer class="footer">
+    <div class="content has-text-centered">
+      <p>
+        <strong>iVote©</strong>
+        by Kai S.
+      </p>
+    </div>
+  </footer>
+ </html>

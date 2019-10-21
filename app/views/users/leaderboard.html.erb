@@ -1,0 +1,59 @@
+<div class="is-centered" style="text-align: center; margin-bottom:35px;   margin-top:50px">
+  <h1 style="font-size:1.8em">
+    <b>Leaderboard</b>
+  </h1>
+
+  <p>Creating a poll cost 10pts</p>
+  <p>Answering a poll awards you 2pts</p>
+  <p>Another user answering your poll awards you 1pt</p>
+  
+</div>
+<div class="box">
+  <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+    <thead>
+      <tr>
+        <th>
+          <abbr title="Position">Position</abbr>
+        </th>
+        <th>Username</th>
+        <th>
+          <abbr title="Score">Score</abbr>
+        </th>
+        <th>
+          <abbr title="Polls Asked">Polls Asked</abbr>
+        </th>
+        <th>
+          <abbr title="Followers">Followers</abbr>
+        </th>
+        <th>
+          <abbr title="Following">Following</abbr>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+    <% counter = 0 %>
+      <% @users.order(score: :desc).each do |user| %>
+        <% if user.id == current_user.id %>
+            <tr class="is-selected" style="background-color: #209cee">
+              <td><b><%= counter+=1 %></b></td>
+              <td><%= link_to user.username.capitalize, user_path(user.id) %></td>
+              <td><%= user.score %></td>
+              <td><%= user.polls.count %></td>
+              <td><%= user.followers.count %></td>
+              <td><%= user.following.count %></td>
+            </tr>
+          <% else %>
+            <tr>
+              <td><b><%= counter+=1 %></b></td>
+              <td><%= link_to user.username.capitalize, user_path(user.id) %></td>
+              <td><%= user.score %></td>
+              <td><%= user.polls.count %></td>
+              <td><%= user.followers.count %></td>
+              <td><%= user.following.count %></td>
+            </tr>
+          <% end %>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+<br><br><br>

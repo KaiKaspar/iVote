@@ -1,0 +1,20 @@
+
+
+
+<br>
+<div class="columns">
+  <div class="column">
+    <h2 class="title is-3">Followers:
+    </h2>
+    <% @user.followers.each do |f| %>
+      <h2 class="title is-5"><%= link_to "@" + User.find(f.follower_id).username, user_path(f.follower_id) %></h2>
+    <% end %>
+  </div>
+  <div class="column">
+    <h2 class="title is-3">Following:
+    </h2>
+    <% @user.following.each do |f| %>
+      <h2 class="title is-5"><%= link_to "@" + User.find(f.followed_id).username, user_path(f.followed_id) %></h2>
+    <% end %>
+  </div>
+</div>

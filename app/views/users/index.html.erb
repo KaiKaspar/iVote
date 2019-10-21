@@ -1,0 +1,59 @@
+<div class="is-centered" style="text-align: center; margin-bottom:35px;   margin-top:50px">
+  <h1 style="font-size:1.8em">
+    <b>All Users</b>
+  </h1>
+
+  <h2 style="font-size:1.2em; margin-bottom:10px;">Username -
+    <%= current_user.username.capitalize %></h2>
+    <%= form_tag(users_path, method: "get") do %>
+    <%= text_field_tag(:search, params[:search], class: 'input', style: 'width:20%; height:1.6em') %>
+    <%= submit_tag("Search", class: 'button is-info', style: 'height:1.6em; padding-top:0px') %>
+    <% end %>
+    <br>
+    <% if cookies[:search] %>
+    <b><%= cookies[:search] %></b>
+    <% end %>
+</div>
+
+<% @users = @users.sort_by{|u| u.username.downcase} %>
+
+<div class="columns is-multiline">
+  <% @users.each do |user| %>
+    <% if user.username.downcase != current_user.username.downcase %>
+      <div class="column is-one-fifth">
+        <div class="box">
+          <article class="media">
+          <div class="media-left">
+      <figure class="image is-64x64">
+        <%= image_tag(user.profile_picture.img_url) %>
+      </figure>
+    </div>
+    <div class="media-content">
+      <div class="content">
+          <%= link_to user.username.capitalize, user_path(user.id) %>
+          <% if user.user_type != "free" %>✔️<% end %>
+          <br>
+          Score:
+          <%= user.score %>
+          <br>
+          <div class="media-right" style="text-align:right">
+          <%= form_tag(followers_path) %>
+          <% if Follower.where(follower_id: current_user.id).map{|f| f.followed_id}.include?(user.id) %>
+            <%= hidden_field_tag 'todo', "unfollow" %>
+            <%= button_tag(type: 'submit', class: "button is-secondary", value: user.id) do %>
+            <% content_tag(:normal, 'Unfollow') %><% end %>
+          <% else  %>
+            <%= hidden_field_tag 'todo', "follow" %>
+            <%= button_tag(type: 'submit', class: "button is-info", value: user.id) do %>
+            <% content_tag(:normal, 'Follow') %><% end %>
+          <% end %>
+        </form>
+        </div>
+      </div>
+      </article>
+      </div>
+    </div>
+    <% end %>
+  <% end %>
+</div>
+<br><br><br>

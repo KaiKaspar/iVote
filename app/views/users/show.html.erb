@@ -1,0 +1,122 @@
+<div class="container is-fluid" style="margin-top:20px; margin-bottom:20px;">
+  <div class="is-centered box" style="text-align: center;">
+    <article class="media">
+      <div class="media-left">
+        <figure class="image is-300x300">
+          <%= image_tag(@user.profile_picture.img_url, size: "300x300") %>
+        </figure>
+      </div>
+      <div class="columns is-12" style="width:100%; margin:20px;">
+        <div class="column is-6" style="padding-top:0px;">
+          <h2 class="title is-2"><%= @user.username.capitalize %></h2>
+          <% if @user.user_type != "free" %>
+            ✔️<% end %>
+          <br>
+
+          <%= form_tag(followers_path) %>
+          <% if current_user.id != @user.id %>
+            <% if Follower.where(follower_id: current_user.id).map{|f| f.followed_id}.include?(@user.id) %>
+              <%= hidden_field_tag 'todo', "unfollow" %>
+              <%= button_tag(type: 'submit', class: "button is-secondary", value: @user.id) do %>
+              <% content_tag(:normal, 'Unfollow') %><% end %>
+            <% else  %>
+              <%= hidden_field_tag 'todo', "follow" %>
+              <%= button_tag(type: 'submit', class: "button is-info", value: @user.id) do %>
+              <% content_tag(:normal, 'Follow') %><% end %>
+            <% end %>
+          <% end %>
+        </form>
+      </div>
+      <div class="column is-6">
+        <h2 class="title is-5"><%= link_to "Followers: ", follower_path(@user)%><%= @user.followers.count %></h2>
+        <h2 class="title is-5"><%= link_to "Following: ", follower_path(@user)%><%= @user.following.count %></h2>
+      </div>
+    </div>
+  </article>
+</div>
+<div class="columns">
+  <div class="column">
+    <h2 class="title is-3">Answered:
+    </h2>
+
+    <% @votes.order(:created_at).reverse.each do |v| %>
+      <% if v.user_id == @user.id %>
+        <div class="box">
+          Poll:
+          <strong><%= link_to Poll.find(v.poll_id).question, poll_path(v.poll_id) %></strong>
+          <br>
+          <%= @user.username %> Answer:
+          <%  if v.vote == true %>
+            <strong><%= Poll.find(v.poll_id).answer_one %></strong>
+          <% else %>
+            <strong><%= Poll.find(v.poll_id).answer_two %></strong>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+  <div class="column">
+    <h2 class="title is-3">Asked:
+    </h2>
+    <% @user.polls.reverse.each do |poll| %>
+      <div class="box is-centered" style="text-align: center;">
+        <h1 style="font-size:1.8em"><%= link_to poll.question, poll_path(poll) %></h1><br>
+        <div style="font-size:1.4em">
+
+          <% if Vote.all.where(poll_id: poll.id).count > 0 %>
+            <% red = (((Vote.all.where(poll_id: poll.id, vote: true).count).to_f/(Vote.all.where(poll_id: poll.id).count).to_f)*100).round %>
+              <% green = 100-red%><% end %>
+
+              <%= form_tag(votes_path) %>
+
+              <%= hidden_field_tag 'poll_id', poll.id %>
+
+              <% if !current_user.votes.find_by(poll_id: poll.id) == true %>
+                <%= button_tag(type: 'submit', class: "button is-danger", value: true) do %>
+                <% content_tag(:strong, poll.answer_one) %><% end %>
+                or
+                <%= button_tag(type: 'submit', class: "button is-success", value: false) do %>
+                <% content_tag(:strong, poll.answer_two) %><% end %>
+                <br>
+              </form>
+            <% else %>
+              You voted for
+              <b>
+                <u><%= current_user.votes.find_by(poll_id: poll.id).vote ? poll.answer_one : poll.answer_two %></u>
+              </b>
+              <br><br>
+              <%= button_tag(type: 'button', class: "button is-danger", value: true) do %>
+              <% content_tag(:strong, poll.answer_one) %><% end %>
+              or
+              <%= button_tag(type: 'button', class: "button is-success", value: false) do %>
+              <% content_tag(:strong, poll.answer_two) %><% end %>
+              <br>
+              <br>
+
+              <% if red == 100 %>
+                <div class="vote-bar" style="width:100%; background-color:#ff3860;"></div>
+                <% elsif red == 0 %>
+                  <div class="vote-bar" style="width:100%; background-color:#23d160;"></div>
+                <% else %>
+                  <div class="vote-bar" style="width:<%= red %>%; background-color:#ff3860; border-top-right-radius:0px; border-bottom-right-radius:0px"></div>
+                  <div class="vote-bar" style="width:<%= green %>%; background-color:#23d160; border-top-left-radius:0px; border-bottom-left-radius:0px;"></div>
+                <% end %>
+
+                <%= red %>% -
+                <%= green %>%
+                <br><br>
+                Total Votes
+                <br>
+                <%= poll.votes.where(vote: true).count %>
+                -
+                <%= poll.votes.where(vote: false).count%>
+              <% end %>
+
+            </div><br>
+
+            <h5 style="font-size:0.8em">Created at: <%= poll.created_at.strftime("%H:%M, %d %b") %></h5>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>

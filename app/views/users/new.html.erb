@@ -1,0 +1,39 @@
+<style>
+  input[type=radio]:checked+img{
+    border: 5px solid black !important;
+    border-radius: 50px;
+    cursor:point
+  }
+  input[type=radio]{
+    display:none;
+  }
+    img:hover{
+    border: 5px solid black !important;
+    border-radius: 50px;
+    cursor:pointer
+  }
+</style>
+
+<div class="column is-12 is-centered" style="margin-top: 30px;">
+  <h2 class="title is-2">Sign up</h2>
+  <%= form_for @user do |f| %>
+
+  <label class="label"><i class="fas fa-user"></i>&nbsp;&nbsp;Username</label>
+  <%= f.text_field :username, class: 'input' %><br><br>
+
+  <label class="label"><i class="fas fa-images"></i></i>&nbsp;&nbsp;Profile Picture</label>
+  <%= f.collection_radio_buttons(:profile_picture_id, @profile_pictures, :id, :img_url, {:class=>'my-custom-class'}) do |b|%>
+  <%= b.label { b.radio_button + image_tag(b.text, size: "100x100") } %>
+  <% end %><br><br>
+
+  <label class="label"><i class="fas fa-envelope-open-text"></i>&nbsp;&nbsp;Email</label>
+  <%= f.text_field :email, class: 'input' %><br><br>
+
+  <label class="label"><i class="fas fa-key"></i>&nbsp;&nbsp;Password</label>
+  <%= f.password_field :password, autofocus: true, class:'input' %>
+
+  <br><br><br>
+  <%= f.submit class: "button is-primary" %>
+
+<% end %>
+</div>

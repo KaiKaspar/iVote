@@ -1,0 +1,94 @@
+<div class="columns">
+  <div class="column is-8">
+    <br>
+    <div class="is-centered box" style="text-align: center;">
+      <h1 style="font-size:1.8em"><%= @poll.question %></h1><br>
+      <div style="font-size:1.4em">
+
+        <% if Vote.all.where(poll_id: @poll.id).count > 0 %>
+          <% red = (((Vote.all.where(poll_id: @poll.id, vote: true).count).to_f/(Vote.all.where(poll_id: @poll.id).count).to_f)*100).round %>
+            <% green = 100-red%><% end %>
+
+            <%= form_tag(votes_path) %>
+
+            <%= hidden_field_tag 'poll_id', @poll.id %>
+
+            <% if !current_user.votes.find_by(poll_id: @poll.id) == true %>
+              <%= button_tag(type: 'submit', class: "button is-danger", value: true) do %>
+              <% content_tag(:strong, @poll.answer_one) %><% end %>
+              or
+              <%= button_tag(type: 'submit', class: "button is-success", value: false) do %>
+              <% content_tag(:strong, @poll.answer_two) %><% end %>
+              <br>
+            </form>
+          <% else %>
+            You voted for
+            <b>
+              <u><%= current_user.votes.find_by(poll_id: @poll.id).vote ? @poll.answer_one : @poll.answer_two %></u>
+            </b>
+            <br><br>
+            <%= button_tag(type: 'button', class: "button is-danger", value: true) do %>
+            <% content_tag(:strong, @poll.answer_one) %><% end %>
+            or
+            <%= button_tag(type: 'button', class: "button is-success", value: false) do %>
+            <% content_tag(:strong, @poll.answer_two) %><% end %>
+            <br>
+            <br>
+          </form>
+
+          <% if red == 100 %>
+            <div class="vote-bar" style="width:100%; background-color:#ff3860;"></div>
+            <% elsif red == 0 %>
+              <div class="vote-bar" style="width:100%; background-color:#23d160;"></div>
+            <% else %>
+              <div class="vote-bar" style="width:<%= red %>%; background-color:#ff3860; border-top-right-radius:0px; border-bottom-right-radius:0px"></div>
+              <div class="vote-bar" style="width:<%= green %>%; background-color:#23d160; border-top-left-radius:0px; border-bottom-left-radius:0px;"></div>
+            <% end %>
+
+            <%= red %>% -
+            <%= green %>%
+            <br><br>
+            Total Votes
+            <br>
+            <%= @poll.votes.where(vote: true).count %>
+            -
+            <%= @poll.votes.where(vote: false).count%>
+          <% end %>
+
+        </div><br>
+
+        <h5 style="font-size:0.8em">Created by:
+          <%= link_to @poll.user.username, user_path(@poll.user.id) %></h5>
+      </div>
+    </div>
+    <div class="column">
+    <br>
+      <div class="box is-centered" style="margin-bottom:40px;">
+        Comment Section
+        <div class="columns is-4 is-multiline" style="margin-top:20px;">
+          <div class="column">
+            <% @poll.comments.order(:created_at).each do |comment| %>
+
+              <div class="box">
+                <b><%= link_to comment.user.username, user_path(comment.user) %> </b>
+                <%= comment.text %><br>
+                <span style="font-size:0.75em; color:grey"><%= comment.created_at.strftime("%H:%M, %d %b") %></span>
+              </div>
+
+            <% end %>
+          </div>
+        </div>
+
+
+        <div class="box is-centered column is-12 is-multiline">
+          <h5>Add a comment</h5>
+
+          <%= form_tag(comments_path) %>
+          <textarea name="text" id="text" style="width:100%; border-color:lightgrey; border-radius:4px; font-size:20px;"></textarea><br>
+          <%= hidden_field_tag 'poll_id', @poll.id %>
+          <%= hidden_field_tag 'user_id', current_user.id %>
+          <%= button_tag(type: 'submit', class: "button is-primary") do %>
+          <% content_tag(:normal, 'Submit') %><% end %>
+        </div>
+      </div>
+    </div>

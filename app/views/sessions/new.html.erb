@@ -1,0 +1,12 @@
+<div class="column is-12 is-centered" style="margin-top: 50px;">
+	<h2 class="title is-2">User Login</h2>
+	<%= form_tag(sessions_path) do %>
+			<label class="label"><i class="fas fa-envelope-open-text"></i>&nbsp;&nbsp;Email</label>
+			<%= text_field_tag :email, "", class: 'input' %><br><br>
+			<label class="label"><i class="fas fa-key"></i>&nbsp;&nbsp;Password</label>
+
+			<%= password_field_tag :password, "", class: 'input' %><br><br><br>
+
+	<%= button_tag :'Sign In', class: "button is-primary is-hovered" %>
+<% end %>
+</div>

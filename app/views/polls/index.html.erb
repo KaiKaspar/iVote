@@ -1,0 +1,92 @@
+<div class="container is-fluid" style="margin-top:20px; margin-bottom:20px;">
+  <div class="is-centered" style="text-align: center; margin-bottom:35px; margin-top:50px">
+    <h1 style="font-size:1.8em">
+      <b>iVote</b>
+    </h1>
+    <h2 style="font-size:1.2em; margin-bottom:10px;"><%= current_user.username %>
+      -
+      <%= current_user.score %>pts</h2>
+    <a href="<%= new_poll_path %>">
+      <button class="button is-info" style="font-size:1em">Create a Poll</button>
+    </a>
+    <br><br>
+    <form action="" method="get">
+      <div class="select">
+        <select name="filter">
+          <option value="all" <%= @filter == 'all' ? "selected" : nil %>>View All</option>
+          <option value="follow" <%= @filter == 'follow' ? "selected" : nil %>>Following</option>
+          <option value="polls" <%= @filter == 'polls' ? "selected" : nil %>>Unanswered Polls</option>
+          <option value="answers" <%= @filter == 'answers' ? "selected" : nil %>>Answered Polls</option>
+          <option value="date_desc" <%= @filter == 'date_desc' ? "selected" : nil %>>Oldest First</option>
+          <option value="date_asc" <%= @filter == 'date_asc' ? "selected" : nil %>>Newest First</option>
+        </select>
+      </div>
+      <button type="submit" class="button is-secondary">Filter</button>
+    </form>
+  </div>
+
+
+
+  <% @polls.each do |poll| %>
+    <div class="box is-centered" style="text-align: center;">
+      <h1 style="font-size:1.8em"><%= link_to poll.question, poll_path(poll) %></h1><br>
+      <div style="font-size:1.4em">
+
+        <% if Vote.all.where(poll_id: poll.id).count > 0 %>
+          <% red = (((Vote.all.where(poll_id: poll.id, vote: true).count).to_f/(Vote.all.where(poll_id: poll.id).count).to_f)*100).round %>
+            <% green = 100-red%><% end %>
+
+            <%= form_tag(votes_path) %>
+
+            <%= hidden_field_tag 'poll_id', poll.id %>
+
+            <% if !current_user.votes.find_by(poll_id: poll.id) == true %>
+              <%= button_tag(type: 'submit', class: "button is-danger", value: true) do %>
+              <% content_tag(:strong, poll.answer_one) %><% end %>
+              or
+              <%= button_tag(type: 'submit', class: "button is-success", value: false) do %>
+              <% content_tag(:strong, poll.answer_two) %><% end %>
+              <br>
+            </form>
+          <% else %>
+            You voted for
+            <b>
+              <u><%= current_user.votes.find_by(poll_id: poll.id).vote ? poll.answer_one : poll.answer_two %></u>
+            </b>
+            <br><br>
+            <%= button_tag(type: 'button', class: "button is-danger", value: true) do %>
+            <% content_tag(:strong, poll.answer_one) %><% end %>
+            or
+            <%= button_tag(type: 'button', class: "button is-success", value: false) do %>
+            <% content_tag(:strong, poll.answer_two) %><% end %>
+            <br>
+            <br>
+
+            <% if red == 100 %>
+              <div class="vote-bar" style="width:100%; background-color:#ff3860;"></div>
+              <% elsif red == 0 %>
+                <div class="vote-bar" style="width:100%; background-color:#23d160;"></div>
+              <% else %>
+                <div class="vote-bar" style="width:<%= red %>%; background-color:#ff3860; border-top-right-radius:0px; border-bottom-right-radius:0px"></div>
+                <div class="vote-bar" style="width:<%= green %>%; background-color:#23d160; border-top-left-radius:0px; border-bottom-left-radius:0px;"></div>
+              <% end %>
+
+              <%= red %>% -
+              <%= green %>%
+              <br><br>
+              Total Votes
+              <br>
+              <%= poll.votes.where(vote: true).count %>
+              -
+              <%= poll.votes.where(vote: false).count%>
+            <% end %>
+
+          </div><br>
+
+          <h5 style="font-size:0.8em">Created by:
+            <%= link_to poll.user.username, user_path(poll.user.id) %> at <%= poll.created_at.strftime("%H:%M, %d %b") %></h5>
+        </div>
+      <% end %>
+
+    </div>
+<br><br><br>
